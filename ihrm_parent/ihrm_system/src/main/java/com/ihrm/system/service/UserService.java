@@ -117,8 +117,7 @@ public class UserService {
             return cb.and(list.toArray(new Predicate[list.size()]));
         };
         //分页
-        Page<User> userPage = userDao.findAll(spec,PageRequest.of(page, size));
-
+        Page<User> userPage = userDao.findAll(spec,PageRequest.of(page-1, size));
         return userPage;
     }
 }
