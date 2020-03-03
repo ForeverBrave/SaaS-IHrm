@@ -52,12 +52,12 @@ public class PermissionService {
      */
     public void savePermission(Map<String,Object> map) throws Exception {
         //设置主键的值
-        String id = idWorker.nextId() + "";
-        //通过map构造permission对象
-        Permission permission = BeanMapUtils.mapToBean(map, Permission.class);
-        permission.setId(id);
-        //根据类型构造不同的资源对象（菜单、按钮、api）
-        int type = permission.getType();
+        String id = idWorker.nextId()+"";
+        //1.通过map构造permission对象
+        Permission perm = BeanMapUtils.mapToBean(map,Permission.class);
+        perm.setId(id);
+        //2.根据类型构造不同的资源对象（菜单，按钮，api）
+        int type = perm.getType();
         switch (type){
             case PermissionConstants.PY_MENU:
                 PermissionMenu menu = BeanMapUtils.mapToBean(map, PermissionMenu.class);
@@ -78,7 +78,7 @@ public class PermissionService {
                 throw new CommonException(ResultCode.FAIL);
         }
         //保存权限
-        permissionDao.save(permission);
+        permissionDao.save(perm);
     }
 
     /**

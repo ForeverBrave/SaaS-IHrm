@@ -46,10 +46,8 @@ public class Permission implements Serializable {
 
     private String pid;
 
-    /**
-     * 可见状态
-     */
-    private Integer enVisible;
+    //可见状态
+    private String enVisible;
 
     public Permission(String name, Integer type, String code, String description) {
         this.name = name;

@@ -4,9 +4,8 @@ import com.ihrm.common.controller.BaseController;
 import com.ihrm.common.entity.PageResult;
 import com.ihrm.common.entity.Result;
 import com.ihrm.common.entity.ResultCode;
-import com.ihrm.domain.company.Company;
-import com.ihrm.domain.company.dto.DeptListDto;
 import com.ihrm.domain.system.User;
+import com.ihrm.domain.system.response.UserResult;
 import com.ihrm.system.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,6 +26,27 @@ public class UserController extends BaseController {
 
     @Autowired
     private UserService userService;
+
+    /**
+     * 分配角色
+     * @param map
+     * @return
+     */
+    @PutMapping("/user/assignRoles")
+    public Result assignRoles(@RequestBody Map<String,Object> map){
+        try {
+            //1、获取被分配的用户id
+            String userId = (String) map.get("id");
+            //2、获取到角色的id列表
+            List<String> roleIds = (List<String>) map.get("roleIds");
+            //3、调用service完成角色分配
+            userService.assignRoles(userId,roleIds);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.FAIL();
+        }
+        return Result.SUCCESS();
+    }
 
     /**
      * 新增用户
@@ -74,14 +94,16 @@ public class UserController extends BaseController {
      */
     @GetMapping("/user/{id}")
     public Result findUserById(@PathVariable String id){
-        User userById = null;
+        UserResult userResult = null;
         try {
-            userById = userService.findUserById(id);
+            //添加roleIds（用户所具有的角色）
+            User user = userService.findUserById(id);
+            userResult = new UserResult(user);
         } catch (Exception e) {
             e.printStackTrace();
             return Result.FAIL();
         }
-        return new Result(ResultCode.SUCCESS,userById);
+        return new Result(ResultCode.SUCCESS,userResult);
     }
 
     /**

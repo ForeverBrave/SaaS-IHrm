@@ -5,6 +5,7 @@ import com.ihrm.common.entity.PageResult;
 import com.ihrm.common.entity.Result;
 import com.ihrm.common.entity.ResultCode;
 import com.ihrm.domain.system.Role;
+import com.ihrm.domain.system.response.RoleResult;
 import com.ihrm.system.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,6 +26,27 @@ public class RoleController extends BaseController {
 
     @Autowired
     private RoleService roleService;
+
+    /**
+     * 分配权限
+     * @param map
+     * @return
+     */
+    @PutMapping("/role/assignPrem")
+    public Result assignPerms(@RequestBody Map<String,Object> map){
+        try {
+            //1、获取被分配的角色id
+            String roleId = (String) map.get("id");
+            //2、获取到权限的id列表
+            List<String> permIds = (List<String>) map.get("permIds");
+            //3、调用service完成权限分配
+            roleService.assignPerms(roleId,permIds);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.FAIL();
+        }
+        return Result.SUCCESS();
+    }
 
     /**
      * 新增用户
@@ -69,14 +91,16 @@ public class RoleController extends BaseController {
      */
     @GetMapping("/role/{id}")
     public Result findRoleById(@PathVariable String id){
-        Role roleById = null;
+        RoleResult roleResult = null;
         try {
-            roleById = roleService.findRoleById(id);
+            //添加permIds（角色所具有的权限）
+            Role role = roleService.findRoleById(id);
+            roleResult = new RoleResult(role);
         } catch (Exception e) {
             e.printStackTrace();
             return Result.FAIL();
         }
-        return new Result(ResultCode.SUCCESS,roleById);
+        return new Result(ResultCode.SUCCESS,roleResult);
     }
 
     /**

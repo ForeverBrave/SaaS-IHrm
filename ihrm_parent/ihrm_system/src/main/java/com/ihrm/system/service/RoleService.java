@@ -2,7 +2,10 @@ package com.ihrm.system.service;
 
 import com.ihrm.common.service.BaseService;
 import com.ihrm.common.utils.IdWorker;
+import com.ihrm.common.utils.PermissionConstants;
+import com.ihrm.domain.system.Permission;
 import com.ihrm.domain.system.Role;
+import com.ihrm.system.dao.PermissionDao;
 import com.ihrm.system.dao.RoleDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,9 +18,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author : Brave
@@ -26,8 +27,13 @@ import java.util.Map;
  */
 @Service
 public class RoleService extends BaseService {
+
     @Autowired
     private RoleDao roleDao;
+
+    @Autowired
+    private PermissionDao permissionDao;
+
     @Autowired
     private IdWorker idWorker;
 
@@ -99,5 +105,29 @@ public class RoleService extends BaseService {
      */
     public List<Role> findAll(String companyId) {
         return roleDao.findAll(getSpec(companyId));
+    }
+
+    /**
+     * 分配权限
+     * @param roleId
+     * @param permIds
+     */
+    public void assignPerms(String roleId,List<String> permIds) {
+        //1.获取分配的角色对象
+        Role role = roleDao.findById(roleId).get();
+        //2.构造角色的权限集合
+        Set<Permission> perms = new HashSet<>();
+        for (String permId : permIds) {
+            Permission permission = permissionDao.findById(permId).get();
+            //需要根据父id和类型查询API权限列表
+            List<Permission> apiList = permissionDao.findByTypeAndPid(PermissionConstants.PY_API, permission.getId());
+            perms.addAll(apiList);//自定赋予API权限
+            perms.add(permission);//当前菜单或按钮的权限
+        }
+        System.out.println(perms.size());
+        //3.设置角色和权限的关系
+        role.setPermissions(perms);
+        //4.更新角色
+        roleDao.save(role);
     }
 }

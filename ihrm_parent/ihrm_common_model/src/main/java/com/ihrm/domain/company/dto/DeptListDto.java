@@ -3,7 +3,6 @@ package com.ihrm.domain.company.dto;
 import com.ihrm.domain.company.Company;
 import com.ihrm.domain.company.Department;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -13,7 +12,6 @@ import java.util.List;
  * @Date : 2020/3/2 10:44
  */
 @Data
-@NoArgsConstructor
 public class DeptListDto {
 
     private String companyId;
