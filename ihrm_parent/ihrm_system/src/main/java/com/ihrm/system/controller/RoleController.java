@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -49,10 +50,10 @@ public class RoleController extends BaseController {
      * @return
      */
     @GetMapping("/role")
-    public Result findAllRolesByPage(int page, int size,Role role){
+    public Result findAllRolesByPage(Integer page, Integer pagesize,Role role){
         PageResult<Role> pageResult = null;
         try {
-            Page<Role> rolePage = roleService.findAllRolesByPage(companyId, page, size);
+            Page<Role> rolePage = roleService.findAllRolesByPage(companyId, page, pagesize);
             pageResult = new PageResult(rolePage.getTotalElements(),rolePage.getContent());
         } catch (Exception e) {
             e.printStackTrace();
@@ -79,6 +80,22 @@ public class RoleController extends BaseController {
     }
 
     /**
+     * 查询所有用户
+     * @return
+     */
+    @GetMapping("/role/list")
+    public Result findAll(){
+        List<Role> roleList = null;
+        try {
+            roleList = roleService.findAll(companyId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.FAIL();
+        }
+        return new Result(ResultCode.SUCCESS,roleList);
+    }
+
+    /**
      * 修改用户
      * @param id
      * @param role
@@ -87,9 +104,7 @@ public class RoleController extends BaseController {
     @PutMapping("/role/{id}")
     public Result updateRole(@PathVariable String id,@RequestBody Role role){
         try {
-            //1.设置修改用户的id
-            role.setId(id);
-            //2.调用service进行更新
+            //1.调用service进行更新
             roleService.updateRole(role);
         } catch (Exception e) {
             e.printStackTrace();

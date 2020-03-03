@@ -1,5 +1,6 @@
 package com.ihrm.system.service;
 
+import com.ihrm.common.service.BaseService;
 import com.ihrm.common.utils.IdWorker;
 import com.ihrm.domain.system.Role;
 import com.ihrm.system.dao.RoleDao;
@@ -24,7 +25,7 @@ import java.util.Map;
  * @Date : 2020/3/2 15:02
  */
 @Service
-public class RoleService {
+public class RoleService extends BaseService {
     @Autowired
     private RoleDao roleDao;
     @Autowired
@@ -75,11 +76,11 @@ public class RoleService {
      * 分页查询所有角色
      * @param companyId
      * @param page
-     * @param size
+     * @param pagesize
      *
      * @return
      */
-    public Page<Role> findAllRolesByPage(String companyId,int page,int size){
+    public Page<Role> findAllRolesByPage(String companyId,Integer page,Integer pagesize){
         /**
          * 角色构造查询条件（这里使用了lambda表达式）
          * 参数说明
@@ -87,10 +88,16 @@ public class RoleService {
          *      cq：一般不用
          *      cb：构造查询条件
          */
-        Specification<Role> spec = (Specification<Role>) (root, cq, cb) ->
-                cb.equal(root.get("companyId").as(String.class),companyId);
-
         //分页
-        return roleDao.findAll(spec,PageRequest.of(page-1, size));
+        return roleDao.findAll(getSpec(companyId),PageRequest.of(page-1, pagesize));
+    }
+
+    /**
+     * 查询所有角色
+     * @param companyId
+     * @return
+     */
+    public List<Role> findAll(String companyId) {
+        return roleDao.findAll(getSpec(companyId));
     }
 }
