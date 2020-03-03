@@ -33,6 +33,15 @@ public class UserService {
     private IdWorker idWorker;
 
     /**
+     * 根据mobile查询用户
+     * @param mobile
+     * @return
+     */
+    public User findByMobile(String mobile){
+        return userDao.findByMobile(mobile);
+    }
+
+    /**
      * 新增用户
      * @param user
      */

@@ -1,6 +1,7 @@
 package com.ihrm.system;
 
 import com.ihrm.common.utils.IdWorker;
+import com.ihrm.common.utils.JwtUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -19,11 +20,20 @@ public class SystemApplication {
     }
 
     /**
-     * SpringBootApplication初始化的时候启动IdWorker
+     * SpringBootApplication初始化的时候注入IdWorker
      * @return
      */
     @Bean
     public IdWorker idWorker(){
         return new IdWorker();
+    }
+
+    /**
+     * SpringBootApplication初始化的时候注入JwtUtils
+     * @return
+     */
+    @Bean
+    public JwtUtils jwtUtils(){
+        return new JwtUtils();
     }
 }

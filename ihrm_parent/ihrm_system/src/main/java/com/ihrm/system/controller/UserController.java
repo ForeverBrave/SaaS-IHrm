@@ -4,13 +4,20 @@ import com.ihrm.common.controller.BaseController;
 import com.ihrm.common.entity.PageResult;
 import com.ihrm.common.entity.Result;
 import com.ihrm.common.entity.ResultCode;
+import com.ihrm.common.exception.CommonException;
+import com.ihrm.common.utils.JwtUtils;
 import com.ihrm.domain.system.User;
+import com.ihrm.domain.system.response.ProfileResult;
 import com.ihrm.domain.system.response.UserResult;
 import com.ihrm.system.service.UserService;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +33,9 @@ public class UserController extends BaseController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private JwtUtils jwtUtils;
 
     /**
      * 分配角色
@@ -140,5 +150,51 @@ public class UserController extends BaseController {
             return Result.FAIL();
         }
         return Result.SUCCESS();
+    }
+
+    /**
+     * 用户登录
+     * @param loginMap
+     * @return
+     */
+    @PostMapping("/login")
+    public Result login(@RequestBody Map<String,String> loginMap){
+        String mobile = loginMap.get("mobile");
+        String password = loginMap.get("password");
+
+        User user = userService.findByMobile(mobile);
+        //登录失败
+        if(user == null || !user.getPassword().equals(password)){
+            return new Result(ResultCode.MOBILE_OR_PASSWORDERROR);
+        }else {
+            //登录成功
+            Map<String,Object> map = new HashMap<>();
+            map.put("companyId",user.getCompanyId());
+            map.put("companyName",user.getCompanyName());
+            String token = jwtUtils.createJwt(user.getId(), user.getUsername(), map);
+            return new Result(ResultCode.SUCCESS,token);
+        }
+    }
+
+    /**
+     * 用户登录成功之后，获取用户信息
+     * @return
+     */
+    @PostMapping("/profile")
+    public Result profile(HttpServletRequest request) throws Exception {
+        //1、获取请求头信息，名称为 Authorization
+        String authorization = request.getHeader("Authorization");
+        if(StringUtils.isEmpty(authorization)){
+            throw new CommonException(ResultCode.UNAUTHENTICATED);
+        }
+        //2、替换Bearer+空格（Bearer+空格为 约定熟成）
+        String token = authorization.replace("Bearer ", "");
+        //3、解析token
+        Claims claims = jwtUtils.parseJwt(token);
+        String userId = claims.getId();
+        //4、根据用户id查询用户
+        User user = userService.findUserById(userId);
+        //5、构建返回值对象
+        return new Result(ResultCode.SUCCESS,new ProfileResult(user));
     }
 }
