@@ -35,17 +35,17 @@ public class RoleController extends BaseController {
     @PutMapping("/role/assignPrem")
     public Result assignPerms(@RequestBody Map<String,Object> map){
         try {
-            //1、获取被分配的角色id
+            //1.获取被分配的角色的id
             String roleId = (String) map.get("id");
-            //2、获取到权限的id列表
+            //2.获取到权限的id列表
             List<String> permIds = (List<String>) map.get("permIds");
-            //3、调用service完成权限分配
+            System.out.println("permIds"+permIds);
+            //3.调用service完成权限分配
             roleService.assignPerms(roleId,permIds);
         } catch (Exception e) {
             e.printStackTrace();
-            return Result.FAIL();
         }
-        return Result.SUCCESS();
+        return new Result(ResultCode.SUCCESS);
     }
 
     /**

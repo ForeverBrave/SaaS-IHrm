@@ -15,8 +15,8 @@ public class ParseJwtTest {
      * @param args
      */
     public static void main(String[] args) {
-        String token = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI4ODgiLCJzdWIiOiJCcmF2ZSIsImlhdCI6MTU4MzIyMjU0MSwiY29tcGFueUlkIjoiNjY2NjY2IiwiY29tcGFueU5hbWUiOiLpnZLmmKXlubTljY7mnInpmZDlhazlj7gifQ.NMmZD_9jBz-wD2XybIWySBb6RXpmg32OnfzAxH-DHX0";
-        Claims claims = Jwts.parser().setSigningKey("ihrm").parseClaimsJws(token).getBody();
+        String token = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxMDY2MzcwNDk4NjMzNDg2MzM2Iiwic3ViIjoiemJ6IiwiaWF0IjoxNTgzMzAzMDg4LCJjb21wYW55SWQiOiIxIiwiY29tcGFueU5hbWUiOiLkvKDmmbrmkq3lrqIiLCJleHAiOjE1ODMzMDY2ODh9.AGahtmY7AC8Ou-1sT6qscELAVk3BIukGviMmUI_efUM";
+        Claims claims = Jwts.parser().setSigningKey("saas-ihrm").parseClaimsJws(token).getBody();
 
         //私有数据存放在claims
         System.out.println(claims.getId());

@@ -3,6 +3,7 @@ package com.ihrm.domain.system;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -13,6 +14,7 @@ import java.util.Set;
 @Table(name = "pe_role")
 @Getter
 @Setter
+@ToString
 public class Role implements Serializable {
     private static final long serialVersionUID = 594829320797158219L;
     @Id
@@ -31,7 +33,7 @@ public class Role implements Serializable {
     private String companyId;
 
     @JsonIgnore
-    @ManyToMany(mappedBy="roles") //不维护中间便
+    @ManyToMany(mappedBy="roles")  //不维护中间表
     private Set<User> users = new HashSet<User>(0);//角色与用户   多对多
 
 

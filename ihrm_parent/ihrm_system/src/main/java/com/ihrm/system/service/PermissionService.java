@@ -20,7 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -86,35 +88,35 @@ public class PermissionService {
      * @param map
      */
     public void updatePermission(Map<String,Object> map) throws Exception {
-        Permission perm = BeanMapUtils.mapToBean(map, Permission.class);
-        //通过传递的权限id查询权限
+        Permission perm = BeanMapUtils.mapToBean(map,Permission.class);
+        //1.通过传递的权限id查询权限
         Permission permission = permissionDao.findById(perm.getId()).get();
         permission.setName(perm.getName());
         permission.setCode(perm.getCode());
         permission.setDescription(perm.getDescription());
         permission.setEnVisible(perm.getEnVisible());
-        //根据类型构造不同的资源对象（菜单、按钮、api）
-        int type = permission.getType();
-        switch (type){
+        //2.根据类型构造不同的资源
+        int type = perm.getType();
+        switch (type) {
             case PermissionConstants.PY_MENU:
-                PermissionMenu menu = BeanMapUtils.mapToBean(map, PermissionMenu.class);
+                PermissionMenu menu = BeanMapUtils.mapToBean(map,PermissionMenu.class);
                 menu.setId(perm.getId());
                 permissionMenuDao.save(menu);
                 break;
             case PermissionConstants.PY_POINT:
-                PermissionPoint point = BeanMapUtils.mapToBean(map, PermissionPoint.class);
+                PermissionPoint point = BeanMapUtils.mapToBean(map,PermissionPoint.class);
                 point.setId(perm.getId());
                 permissionPointDao.save(point);
                 break;
             case PermissionConstants.PY_API:
-                PermissionApi api = BeanMapUtils.mapToBean(map, PermissionApi.class);
+                PermissionApi api = BeanMapUtils.mapToBean(map,PermissionApi.class);
                 api.setId(perm.getId());
                 permissionApiDao.save(api);
                 break;
             default:
                 throw new CommonException(ResultCode.FAIL);
         }
-        //修改权限
+        //3.保存
         permissionDao.save(permission);
     }
 
@@ -154,32 +156,29 @@ public class PermissionService {
      * @return
      */
     public Map<String,Object> findPermissionById(String id) throws Exception {
-
-        Permission permission = permissionDao.findById(id).get();
-        Integer type = permission.getType();
+        Permission perm = permissionDao.findById(id).get();
+        int type = perm.getType();
 
         Object object = null;
-        switch (type){
-            case PermissionConstants.PY_MENU:
-                object = permissionMenuDao.findById(id).get();
-                break;
-            case PermissionConstants.PY_POINT:
-                object = permissionPointDao.findById(id).get();
-                break;
-            case PermissionConstants.PY_API:
-                object = permissionApiDao.findById(id).get();
-                break;
-            default:
-                throw new CommonException(ResultCode.FAIL);
+
+        if(type == PermissionConstants.PY_MENU) {
+            object = permissionMenuDao.findById(id).get();
+        }else if (type == PermissionConstants.PY_POINT) {
+            object = permissionPointDao.findById(id).get();
+        }else if (type == PermissionConstants.PY_API) {
+            object = permissionApiDao.findById(id).get();
+        }else {
+            throw new CommonException(ResultCode.FAIL);
         }
 
         Map<String, Object> map = BeanMapUtils.beanToMap(object);
-        map.put("name",permission.getName());
-        map.put("type",permission.getType());
-        map.put("code",permission.getCode());
-        map.put("description",permission.getDescription());
-        map.put("pid",permission.getPid());
-        map.put("enVisible",permission.getEnVisible());
+
+        map.put("name",perm.getName());
+        map.put("type",perm.getType());
+        map.put("code",perm.getCode());
+        map.put("description",perm.getDescription());
+        map.put("pid",perm.getPid());
+        map.put("enVisible",perm.getEnVisible());
 
         return map;
     }
@@ -200,10 +199,9 @@ public class PermissionService {
          *      cq：一般不用
          *      cb：构造查询条件
          */
+        /*
         Specification<Permission> spec = (Specification<Permission>) (root, cq, cb) -> {
-            /**
-             * 动态拼接查询条件
-             */
+            //动态拼接查询条件
             List<Predicate> list = new ArrayList<>();
             //根据父id查询
             if(!StringUtils.isEmpty(map.get("pid"))) {
@@ -224,6 +222,40 @@ public class PermissionService {
                 }
             }
             return cb.and(list.toArray(new Predicate[list.size()]));
+        };
+        return permissionDao.findAll(spec);
+    }
+    */
+        //1.需要查询条件
+        Specification<Permission> spec = new Specification<Permission>() {
+            /**
+             * 动态拼接查询条件
+             * @return
+             */
+            @Override
+            public Predicate toPredicate(Root<Permission> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                List<Predicate> list = new ArrayList<>();
+                //根据父id查询
+                if(!StringUtils.isEmpty(map.get("pid"))) {
+                    list.add(criteriaBuilder.equal(root.get("pid").as(String.class),(String)map.get("pid")));
+                }
+                //根据enVisible查询
+                if(!StringUtils.isEmpty(map.get("enVisible"))) {
+                    list.add(criteriaBuilder.equal(root.get("enVisible").as(String.class),(String)map.get("enVisible")));
+                }
+                //根据类型 type
+                if(!StringUtils.isEmpty(map.get("type"))) {
+                    String ty = (String) map.get("type");
+                    CriteriaBuilder.In<Object> in = criteriaBuilder.in(root.get("type"));
+                    if("0".equals(ty)) {
+                        in.value(1).value(2);
+                    }else{
+                        in.value(Integer.parseInt(ty));
+                    }
+                    list.add(in);
+                }
+                return criteriaBuilder.and(list.toArray(new Predicate[list.size()]));
+            }
         };
         return permissionDao.findAll(spec);
     }

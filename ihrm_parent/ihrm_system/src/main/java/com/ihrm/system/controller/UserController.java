@@ -6,9 +6,11 @@ import com.ihrm.common.entity.Result;
 import com.ihrm.common.entity.ResultCode;
 import com.ihrm.common.exception.CommonException;
 import com.ihrm.common.utils.JwtUtils;
+import com.ihrm.domain.system.Permission;
 import com.ihrm.domain.system.User;
 import com.ihrm.domain.system.response.ProfileResult;
 import com.ihrm.domain.system.response.UserResult;
+import com.ihrm.system.service.PermissionService;
 import com.ihrm.system.service.UserService;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,9 @@ public class UserController extends BaseController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private PermissionService permissionService;
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -194,7 +199,23 @@ public class UserController extends BaseController {
         String userId = claims.getId();
         //4、根据用户id查询用户
         User user = userService.findUserById(userId);
+        //4.1、根据不同的用户级别获取用户权限
+        ProfileResult result = null;
+        if("user".equals(user.getLevel())){
+            //4.2、企业用户具有的当前角色权限
+            result = new ProfileResult(user);
+            System.out.println(result);
+        }else {
+            Map map = new HashMap();
+            if("coAdmin".equals(user.getLevel())){
+                //4.3、企业管理员具有的所有的企业权限
+                map.put("enVisible","1");
+            }
+            //4.4、saas平台管理员具有所有的权限
+            List<Permission> list = permissionService.findAllPermissions(map);
+            result = new ProfileResult(user,list);
+        }
         //5、构建返回值对象
-        return new Result(ResultCode.SUCCESS,new ProfileResult(user));
+        return new Result(ResultCode.SUCCESS,result);
     }
 }

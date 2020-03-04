@@ -124,7 +124,6 @@ public class RoleService extends BaseService {
             perms.addAll(apiList);//自定赋予API权限
             perms.add(permission);//当前菜单或按钮的权限
         }
-        System.out.println(perms.size());
         //3.设置角色和权限的关系
         role.setPermissions(perms);
         //4.更新角色

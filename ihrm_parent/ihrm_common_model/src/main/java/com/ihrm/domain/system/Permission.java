@@ -3,6 +3,7 @@ package com.ihrm.domain.system;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -15,6 +16,7 @@ import java.io.Serializable;
 @Table(name = "pe_permission")
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @DynamicInsert(true)
 @DynamicUpdate(true)
