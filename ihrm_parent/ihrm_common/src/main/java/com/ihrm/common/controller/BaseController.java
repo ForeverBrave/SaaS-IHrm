@@ -29,9 +29,7 @@ public class BaseController {
         if(obj != null) {
             this.claims = (Claims) obj;
             this.companyId = (String)claims.get("companyId");
-            System.out.println("companyId==========>"+companyId);
             this.companyName = (String)claims.get("companyName");
-            System.out.println("companyName==========>"+companyName);
         }else {
             this.companyId="1";
             this.companyName="江苏传智播客教育科技股份有限公司";

@@ -181,16 +181,13 @@ public class UserController extends BaseController {
             for (Role role : user.getRoles()) {
                 //获取到所有可访问的权限
                 for (Permission perm : role.getPermissions()) {
-                    System.out.println("perm.getType========>"+perm.getType());
                     if(perm.getType() == PermissionConstants.PY_API){
                         sb.append(perm.getCode()).append(",");
-                        System.out.println("perm.getCode========>"+perm.getCode());
                     }
                 }
             }
             Map<String,Object> map = new HashMap<>();
             //可访问的api权限字符串
-            System.out.println("apis Login========>"+sb.toString());
             map.put("apis",sb.toString());
             map.put("companyId",user.getCompanyId());
             map.put("companyName",user.getCompanyName());
@@ -207,9 +204,6 @@ public class UserController extends BaseController {
     public Result profile(HttpServletRequest request) throws Exception {
 
         String userId = claims.getId();
-        String companyId = (String) claims.get("companyId");
-        String companyName = (String) claims.get("companyName");
-        System.out.println("===============>"+companyId+"============"+companyName);
         //4、根据用户id查询用户
         User user = userService.findUserById(userId);
         //4.1、根据不同的用户级别获取用户权限
