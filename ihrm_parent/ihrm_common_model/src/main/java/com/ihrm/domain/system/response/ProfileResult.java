@@ -7,21 +7,23 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.util.*;
 
 @Setter
 @Getter
-@ToString
 public class ProfileResult {
     private String mobile;
     private String username;
     private String company;
+    private String companyId;
     private Map<String,Object> roles = new HashMap<>();
 
     public ProfileResult(User user, List<Permission> list) {
         this.mobile = user.getMobile();
         this.username = user.getUsername();
         this.company = user.getCompanyName();
+        this.companyId = user.getCompanyId();
 
         Set<String> menus = new HashSet<>();
         Set<String> points = new HashSet<>();
@@ -48,16 +50,15 @@ public class ProfileResult {
         this.mobile = user.getMobile();
         this.username = user.getUsername();
         this.company = user.getCompanyName();
+        this.companyId = user.getCompanyId();
 
         Set<Role> roles = user.getRoles();
         Set<String> menus = new HashSet<>();
         Set<String> points = new HashSet<>();
         Set<String> apis = new HashSet<>();
         for (Role role : roles) {
-            System.out.println(role);
             Set<Permission> perms = role.getPermissions();
             for (Permission perm : perms) {
-                System.out.println(perm);
                 String code = perm.getCode();
                 if(perm.getType() == 1) {
                     menus.add(code);

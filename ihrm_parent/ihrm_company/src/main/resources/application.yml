@@ -9,7 +9,7 @@ spring:
   #2、数据库连接池配置
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/ihrm?useUnicode=true&characterEncoding=utf8
+    url: jdbc:mysql://localhost:3306/ihrm01?useUnicode=true&characterEncoding=utf8
     username: root
     password: root
   #3、JPA配置

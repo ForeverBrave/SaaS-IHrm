@@ -1,5 +1,6 @@
 package com.ihrm.common.controller;
 
+import io.jsonwebtoken.Claims;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,15 +17,24 @@ public class BaseController {
     protected HttpServletResponse response;
     protected String companyId;
     protected String companyName;
+    protected Claims claims;
 
     @ModelAttribute
-    public void setResAndReq(HttpServletRequest request,HttpServletResponse response){
+    public void setResAnReq(HttpServletRequest request,HttpServletResponse response) {
         this.request = request;
         this.response = response;
-        /**
-         * companyId,companyName暂设固定值
-         */
-        this.companyId = "1";
-        this.companyName = "青春年华";
+
+        Object obj = request.getAttribute("user_claims");
+
+        if(obj != null) {
+            this.claims = (Claims) obj;
+            this.companyId = (String)claims.get("companyId");
+            System.out.println("companyId==========>"+companyId);
+            this.companyName = (String)claims.get("companyName");
+            System.out.println("companyName==========>"+companyName);
+        }else {
+            this.companyId="1";
+            this.companyName="江苏传智播客教育科技股份有限公司";
+        }
     }
 }

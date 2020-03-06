@@ -6,7 +6,9 @@ import com.ihrm.common.entity.Result;
 import com.ihrm.common.entity.ResultCode;
 import com.ihrm.common.exception.CommonException;
 import com.ihrm.common.utils.JwtUtils;
+import com.ihrm.common.utils.PermissionConstants;
 import com.ihrm.domain.system.Permission;
+import com.ihrm.domain.system.Role;
 import com.ihrm.domain.system.User;
 import com.ihrm.domain.system.response.ProfileResult;
 import com.ihrm.domain.system.response.UserResult;
@@ -146,7 +148,7 @@ public class UserController extends BaseController {
      * @param id
      * @return
      */
-    @DeleteMapping("/user/{id}")
+    @RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE,name = "API-USER-DELETE")
     public Result deleteUserById(@PathVariable String id){
         try {
             userService.deleteUserById(id);
@@ -173,7 +175,23 @@ public class UserController extends BaseController {
             return new Result(ResultCode.MOBILE_OR_PASSWORDERROR);
         }else {
             //登录成功
+            //api权限字符串
+            StringBuilder sb = new StringBuilder();
+            //获取到所有可访问的角色
+            for (Role role : user.getRoles()) {
+                //获取到所有可访问的权限
+                for (Permission perm : role.getPermissions()) {
+                    System.out.println("perm.getType========>"+perm.getType());
+                    if(perm.getType() == PermissionConstants.PY_API){
+                        sb.append(perm.getCode()).append(",");
+                        System.out.println("perm.getCode========>"+perm.getCode());
+                    }
+                }
+            }
             Map<String,Object> map = new HashMap<>();
+            //可访问的api权限字符串
+            System.out.println("apis Login========>"+sb.toString());
+            map.put("apis",sb.toString());
             map.put("companyId",user.getCompanyId());
             map.put("companyName",user.getCompanyName());
             String token = jwtUtils.createJwt(user.getId(), user.getUsername(), map);
@@ -187,16 +205,11 @@ public class UserController extends BaseController {
      */
     @PostMapping("/profile")
     public Result profile(HttpServletRequest request) throws Exception {
-        //1、获取请求头信息，名称为 Authorization
-        String authorization = request.getHeader("Authorization");
-        if(StringUtils.isEmpty(authorization)){
-            throw new CommonException(ResultCode.UNAUTHENTICATED);
-        }
-        //2、替换Bearer+空格（Bearer+空格为 约定熟成）
-        String token = authorization.replace("Bearer ", "");
-        //3、解析token
-        Claims claims = jwtUtils.parseJwt(token);
+
         String userId = claims.getId();
+        String companyId = (String) claims.get("companyId");
+        String companyName = (String) claims.get("companyName");
+        System.out.println("===============>"+companyId+"============"+companyName);
         //4、根据用户id查询用户
         User user = userService.findUserById(userId);
         //4.1、根据不同的用户级别获取用户权限
@@ -204,7 +217,6 @@ public class UserController extends BaseController {
         if("user".equals(user.getLevel())){
             //4.2、企业用户具有的当前角色权限
             result = new ProfileResult(user);
-            System.out.println(result);
         }else {
             Map map = new HashMap();
             if("coAdmin".equals(user.getLevel())){
