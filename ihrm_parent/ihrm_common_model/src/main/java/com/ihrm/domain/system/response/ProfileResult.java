@@ -6,13 +6,14 @@ import com.ihrm.domain.system.User;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.crazycake.shiro.AuthCachePrincipal;
 
 import java.io.Serializable;
 import java.util.*;
 
 @Setter
 @Getter
-public class ProfileResult {
+public class ProfileResult implements Serializable, AuthCachePrincipal {
     private String mobile;
     private String username;
     private String company;
@@ -72,5 +73,10 @@ public class ProfileResult {
         this.roles.put("menus",menus);
         this.roles.put("points",points);
         this.roles.put("apis",apis);
+    }
+
+    @Override
+    public String getAuthCacheKey() {
+        return null;
     }
 }

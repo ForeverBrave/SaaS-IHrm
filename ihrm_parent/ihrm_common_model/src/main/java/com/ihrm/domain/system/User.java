@@ -3,6 +3,7 @@ package com.ihrm.domain.system;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -17,6 +18,7 @@ import java.util.Set;
 @Table(name = "bs_user")
 @Getter
 @Setter
+@ToString
 public class User implements Serializable {
     private static final long serialVersionUID = 4297464181093070302L;
     /**

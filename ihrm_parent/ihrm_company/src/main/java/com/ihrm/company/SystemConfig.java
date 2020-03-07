@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 /**
  * @author Brave
  */
-@Configuration
+//@Configuration
 public class SystemConfig extends WebMvcConfigurationSupport {
 
     @Autowired

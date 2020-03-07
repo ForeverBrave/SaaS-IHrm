@@ -17,6 +17,10 @@ spring:
     database: MySQL
     show-sql: true
     open-in-view: true
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: root
 jwt:
   config:
     key: saas-ihrm

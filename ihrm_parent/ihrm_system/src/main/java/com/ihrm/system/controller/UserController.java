@@ -15,6 +15,12 @@ import com.ihrm.domain.system.response.UserResult;
 import com.ihrm.system.service.PermissionService;
 import com.ihrm.system.service.UserService;
 import io.jsonwebtoken.Claims;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.crypto.hash.Md5Hash;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.util.StringUtils;
@@ -168,8 +174,25 @@ public class UserController extends BaseController {
     public Result login(@RequestBody Map<String,String> loginMap){
         String mobile = loginMap.get("mobile");
         String password = loginMap.get("password");
-
-        User user = userService.findByMobile(mobile);
+        try {
+            //密码加密(参数说明： 1、加密内容 2、盐 3、散列次数)
+            password = new Md5Hash(password,mobile,3).toString();
+            System.out.println("password="+password);
+            //1、构造登录令牌
+            UsernamePasswordToken upToken = new UsernamePasswordToken(mobile,password);
+            //2、获取subject
+            Subject subject = SecurityUtils.getSubject();
+            //3、调用login方法，进入realm完成认证
+            subject.login(upToken);
+            //4、获取sessionId
+            String sessionId = (String) subject.getSession().getId();
+            //5、构造返回结果
+            return new Result(ResultCode.SUCCESS,sessionId);
+        } catch (AuthenticationException e) {
+            e.printStackTrace();
+            return new Result(ResultCode.MOBILE_OR_PASSWORDERROR);
+        }
+        /*User user = userService.findByMobile(mobile);
         //登录失败
         if(user == null || !user.getPassword().equals(password)){
             return new Result(ResultCode.MOBILE_OR_PASSWORDERROR);
@@ -193,7 +216,7 @@ public class UserController extends BaseController {
             map.put("companyName",user.getCompanyName());
             String token = jwtUtils.createJwt(user.getId(), user.getUsername(), map);
             return new Result(ResultCode.SUCCESS,token);
-        }
+        }*/
     }
 
     /**
@@ -202,8 +225,13 @@ public class UserController extends BaseController {
      */
     @PostMapping("/profile")
     public Result profile(HttpServletRequest request) throws Exception {
-
-        String userId = claims.getId();
+        //构造subject，获取session中的安全数据
+        Subject subject = SecurityUtils.getSubject();
+        //2、根据subject获取所有的安全数据集合
+        PrincipalCollection principals = subject.getPrincipals();
+        //3、获取安全数据
+        ProfileResult result = (ProfileResult) principals.getPrimaryPrincipal();
+        /*String userId = claims.getId();
         //4、根据用户id查询用户
         User user = userService.findUserById(userId);
         //4.1、根据不同的用户级别获取用户权限
@@ -220,8 +248,9 @@ public class UserController extends BaseController {
             //4.4、saas平台管理员具有所有的权限
             List<Permission> list = permissionService.findAllPermissions(map);
             result = new ProfileResult(user,list);
-        }
+        }*/
         //5、构建返回值对象
         return new Result(ResultCode.SUCCESS,result);
     }
+
 }
