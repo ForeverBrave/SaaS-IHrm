@@ -30,9 +30,6 @@ public class BaseController {
             this.claims = (Claims) obj;
             this.companyId = (String)claims.get("companyId");
             this.companyName = (String)claims.get("companyName");
-        }else {
-            this.companyId="1";
-            this.companyName="江苏传智播客教育科技股份有限公司";
         }
     }
 }
