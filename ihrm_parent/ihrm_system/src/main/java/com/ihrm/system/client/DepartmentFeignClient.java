@@ -16,6 +16,6 @@ public interface DepartmentFeignClient {
     /**
      * 调用微服务接口
      */
-    @GetMapping("/department/{id}")
+    @GetMapping("/company/department/{id}")
     Result findDepartmentById(@PathVariable String id);
 }
