@@ -4,17 +4,11 @@ import com.ihrm.common.controller.BaseController;
 import com.ihrm.common.entity.PageResult;
 import com.ihrm.common.entity.Result;
 import com.ihrm.common.entity.ResultCode;
-import com.ihrm.common.exception.CommonException;
-import com.ihrm.common.utils.JwtUtils;
-import com.ihrm.common.utils.PermissionConstants;
-import com.ihrm.domain.system.Permission;
-import com.ihrm.domain.system.Role;
 import com.ihrm.domain.system.User;
 import com.ihrm.domain.system.response.ProfileResult;
 import com.ihrm.domain.system.response.UserResult;
-import com.ihrm.system.service.PermissionService;
+import com.ihrm.system.client.DepartmentFeignClient;
 import com.ihrm.system.service.UserService;
-import io.jsonwebtoken.Claims;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -24,11 +18,9 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,10 +38,18 @@ public class UserController extends BaseController {
     private UserService userService;
 
     @Autowired
-    private PermissionService permissionService;
+    private DepartmentFeignClient departmentFeignClient;
 
-    @Autowired
-    private JwtUtils jwtUtils;
+    /**
+     * 测试Feign组件
+     * @param id
+     * @return
+     */
+    @GetMapping("/test/{id}")
+    public Result testFeign(@PathVariable String id){
+        Result result = departmentFeignClient.findDepartmentById(id);
+        return result;
+    }
 
     /**
      * 分配角色

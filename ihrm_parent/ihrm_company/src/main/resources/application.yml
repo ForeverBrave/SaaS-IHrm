@@ -25,3 +25,8 @@ jwt:
   config:
     key: saas-ihrm
     ttl: 3600000
+# 注册到eureka的服务地址
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:6868/eureka/
