@@ -1,9 +1,12 @@
 package com.ihrm.system.client;
 
 import com.ihrm.common.entity.Result;
+import com.ihrm.domain.company.Department;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @Author : Brave
@@ -18,4 +21,7 @@ public interface DepartmentFeignClient {
      */
     @GetMapping("/company/department/{id}")
     Result findDepartmentById(@PathVariable String id);
+
+    @PostMapping("/company/department/search")
+    Department findDepartmentByCode(@RequestParam(value = "code") String code, @RequestParam(value = "companyId") String companyId);
 }

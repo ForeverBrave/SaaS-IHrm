@@ -121,4 +121,16 @@ public class DepartmentController extends BaseController {
         }
         return Result.SUCCESS();
     }
+
+    /**
+     * 根据部门编码和企业id查询部门,由于不用与前端进行交互，故不用返回Result
+     * @param code
+     * @param companyId
+     * @return
+     */
+    @PostMapping("/department/search")
+    public Department findDepartmentByCode(@RequestParam(value = "code") String code,@RequestParam(value = "companyId") String companyId){
+        Department dept = departmentService.findDepartmentByCode(code,companyId);
+        return dept;
+    }
 }

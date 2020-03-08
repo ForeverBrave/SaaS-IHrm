@@ -1,8 +1,11 @@
 package com.ihrm.system.service;
 
+import com.ihrm.common.service.BaseService;
 import com.ihrm.common.utils.IdWorker;
+import com.ihrm.domain.company.Department;
 import com.ihrm.domain.system.Role;
 import com.ihrm.domain.system.User;
+import com.ihrm.system.client.DepartmentFeignClient;
 import com.ihrm.system.dao.RoleDao;
 import com.ihrm.system.dao.UserDao;
 import org.apache.shiro.crypto.hash.Md5Hash;
@@ -11,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.criteria.Predicate;
@@ -22,7 +26,7 @@ import java.util.*;
  * @Date : 2020/3/2 15:02
  */
 @Service
-public class UserService {
+public class UserService extends BaseService {
 
     @Autowired
     private UserDao userDao;
@@ -32,6 +36,9 @@ public class UserService {
 
     @Autowired
     private IdWorker idWorker;
+
+    @Autowired
+    private DepartmentFeignClient departmentFeignClient;
 
     /**
      * 根据mobile查询用户
@@ -89,6 +96,15 @@ public class UserService {
      */
     public User findUserById(String id){
         return userDao.findById(id).get();
+    }
+
+    /**
+     * 查询所有用户
+     * @param companyId
+     * @return
+     */
+    public List<User> findAll(String companyId) {
+        return userDao.findAll(super.getSpec(companyId));
     }
 
     /**
@@ -154,5 +170,36 @@ public class UserService {
         user.setRoles(roles);
         //3.更新用户
         userDao.save(user);
+    }
+
+    /**
+     * 批量插入用户
+     * @param userList
+     * @param companyId
+     * @param companyName
+     */
+    @Transactional
+    public void saveAll(List<User> userList, String companyId, String companyName) {
+        for (User user : userList) {
+            //默认密码
+            user.setPassword(new Md5Hash("123456",user.getMobile(),3).toString());
+            //id
+            user.setId(idWorker.nextId()+"");
+            //基本属性
+            user.setCompanyId(companyId);
+            user.setCompanyName(companyName);
+            user.setInServiceStatus(1);
+            user.setEnableState(1);
+            user.setLevel("user");
+
+            //填充部门属性
+            Department dept = departmentFeignClient.findDepartmentByCode(user.getDepartmentId(), companyId);
+            if (dept != null) {
+                user.setDepartmentId(dept.getId());
+                user.setDepartmentName(dept.getName());
+            }
+
+            userDao.save(user);
+        }
     }
 }

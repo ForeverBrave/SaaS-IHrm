@@ -82,4 +82,13 @@ public class DepartmentService extends BaseService {
         return departmentDao.findAll(getSpec(companyId));
     }
 
+    /**
+     * 根据部门编码和企业id查询部门
+     * @param code
+     * @param companyId
+     * @return
+     */
+    public Department findDepartmentByCode(String code, String companyId) {
+        return departmentDao.findByCodeAndCompanyId(code,companyId);
+    }
 }
