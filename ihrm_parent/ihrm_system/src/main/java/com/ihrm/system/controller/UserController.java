@@ -4,6 +4,7 @@ import com.ihrm.common.controller.BaseController;
 import com.ihrm.common.entity.PageResult;
 import com.ihrm.common.entity.Result;
 import com.ihrm.common.entity.ResultCode;
+import com.ihrm.common.poi.ExcelImportUtil;
 import com.ihrm.domain.system.User;
 import com.ihrm.domain.system.response.ProfileResult;
 import com.ihrm.domain.system.response.UserResult;
@@ -277,7 +278,7 @@ public class UserController extends BaseController {
     public Result importUser(@RequestParam(name = "file")MultipartFile file) throws Exception {
         //1、解析Excel
         //1.1.根据Excel文件创建工作簿
-        Workbook wb = new XSSFWorkbook(file.getInputStream());
+       /* Workbook wb = new XSSFWorkbook(file.getInputStream());
         //1.2.获取Sheet
         Sheet sheet = wb.getSheetAt(0);//参数：索引
         //1.3.获取Sheet中的每一行，和每一个单元格
@@ -295,7 +296,9 @@ public class UserController extends BaseController {
             }
             User user = new User(values);
             userList.add(user);
-        }
+        }*/
+
+        List<User> userList = new ExcelImportUtil(User.class).readExcel(file.getInputStream(), 1, 1);
 
         //3、批量保存用户
         userService.saveAll(userList,companyId,companyName);

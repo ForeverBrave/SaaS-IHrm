@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * @author Brave
  */
 @Service
 public class UserCompanyPersonalService {
@@ -23,5 +24,15 @@ public class UserCompanyPersonalService {
 
     public UserCompanyPersonal findById(String userId) {
         return userCompanyPersonalDao.findByUserId(userId);
+    }
+
+    /**
+     * 当月人事报表导出
+     * @param companyId
+     * @param month
+     * @return
+     */
+    public List<EmployeeReportResult> findByReport(String companyId, String month) {
+        return userCompanyPersonalDao.findByReport(companyId,month+"%");
     }
 }

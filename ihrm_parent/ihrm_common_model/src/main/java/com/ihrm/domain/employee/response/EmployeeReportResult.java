@@ -2,13 +2,12 @@ package com.ihrm.domain.employee.response;
 
 import com.ihrm.domain.employee.EmployeeResignation;
 import com.ihrm.domain.employee.UserCompanyPersonal;
+import com.ihrm.domain.poi.ExcelAttribute;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.beans.BeanUtils;
-
-import javax.persistence.Id;
 
 @Getter
 @Setter
@@ -16,10 +15,14 @@ import javax.persistence.Id;
 @ToString
 public class EmployeeReportResult {
 
+    @ExcelAttribute(sort = 0)
     private String userId;
+    @ExcelAttribute(sort = 1)
     private String username;
     private String departmentName;
+    @ExcelAttribute(sort = 2)
     private String mobile;
+    @ExcelAttribute(sort = 9)
     private String timeOfEntry;
     private String companyId;
     private String sex;
@@ -30,14 +33,17 @@ public class EmployeeReportResult {
     /**
      * 最高学历
      */
+    @ExcelAttribute(sort = 3)
     private String theHighestDegreeOfEducation;
     /**
      * 国家地区
      */
+    @ExcelAttribute(sort = 4)
     private String nationalArea;
     /**
      * 护照号
      */
+    @ExcelAttribute(sort = 5)
     private String passportNo;
     /**
      * 身份证号
@@ -54,6 +60,7 @@ public class EmployeeReportResult {
     /**
      * 籍贯
      */
+    @ExcelAttribute(sort = 6)
     private String nativePlace;
     /**
      * 民族
@@ -74,10 +81,12 @@ public class EmployeeReportResult {
     /**
      * 生日
      */
+    @ExcelAttribute(sort = 7)
     private String birthday;
     /**
      * 属相
      */
+    @ExcelAttribute(sort = 8)
     private String zodiac;
     /**
      * 年龄
@@ -239,14 +248,17 @@ public class EmployeeReportResult {
     /**
      * 离职时间
      */
+    @ExcelAttribute(sort = 12)
     private String resignationTime;
     /**
      * 离职类型
      */
+    @ExcelAttribute(sort = 10)
     private String typeOfTurnover;
     /**
      * 申请离职原因
      */
+    @ExcelAttribute(sort = 11)
     private String reasonsForLeaving;
 
     public EmployeeReportResult(UserCompanyPersonal personal, EmployeeResignation resignation) {
