@@ -11,6 +11,7 @@ import com.ihrm.domain.employee.response.EmployeeReportResult;
 import com.ihrm.employee.service.*;
 
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -208,14 +209,15 @@ public class EmployeeController extends BaseController {
      * 当月人事报表导出
      * @param month 年-月(2020-03)
      */
-    /*public void export(@PathVariable String month) throws Exception {
+    @GetMapping("/export/{month}")
+    public void export(@PathVariable String month) throws Exception {
         //1.获取报表数据
         List<EmployeeReportResult> list = userCompanyPersonalService.findByReport(companyId,month);
         //2.构造Excel
         //创建工作簿
         //SXSSFWorkbook : 百万数据报表
-        Workbook wb = new XSSFWorkbook();
-        //SXSSFWorkbook wb = new SXSSFWorkbook(100); //阈值，内存中的对象数量最大数量
+        //Workbook wb = new XSSFWorkbook();
+        SXSSFWorkbook wb = new SXSSFWorkbook(100); //阈值，内存中的对象数量最大数量
         //构造sheet
         Sheet sheet = wb.createSheet();
         //创建行
@@ -281,13 +283,13 @@ public class EmployeeController extends BaseController {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         wb.write(os);
         new DownloadUtils().download(os,response,month+"人事报表.xlsx");
-    }*/
+    }
 
     /**
      * 采用模板打印的形式完成当月人事报表导出
      * @param month 年-月(2020-03)
      */
-    @RequestMapping(value = "/export/{month}", method = RequestMethod.GET)
+   /*  @RequestMapping(value = "/export/{month}", method = RequestMethod.GET)
     public void export(@PathVariable String month) throws Exception {
         //1.获取报表数据
         List<EmployeeReportResult> list = userCompanyPersonalService.findByReport(companyId,month);
@@ -377,5 +379,5 @@ public class EmployeeController extends BaseController {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         wb.write(os);
         new DownloadUtils().download(os,response,month+"人事报表.xlsx");
-    }
+    }*/
 }

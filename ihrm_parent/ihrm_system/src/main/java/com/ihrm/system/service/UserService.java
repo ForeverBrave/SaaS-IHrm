@@ -2,6 +2,7 @@ package com.ihrm.system.service;
 
 import com.ihrm.common.service.BaseService;
 import com.ihrm.common.utils.IdWorker;
+import com.ihrm.common.utils.QiniuUploadUtil;
 import com.ihrm.domain.company.Department;
 import com.ihrm.domain.system.Role;
 import com.ihrm.domain.system.User;
@@ -9,6 +10,7 @@ import com.ihrm.system.client.DepartmentFeignClient;
 import com.ihrm.system.dao.RoleDao;
 import com.ihrm.system.dao.UserDao;
 import org.apache.shiro.crypto.hash.Md5Hash;
+import com.sun.org.apache.xml.internal.security.utils.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,8 +18,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.criteria.Predicate;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -202,4 +206,41 @@ public class UserService extends BaseService {
             userDao.save(user);
         }
     }
+
+    /**
+     * DataUrl 形式实现 图片上传
+     * @param id   用户id
+     * @param file 用户上传的头像文件
+     * @return     请求地址
+     */
+    /*public String uploadImage(String id, MultipartFile file) throws IOException {
+        //1、根据id查询用户
+        User user = userDao.findById(id).get();
+        //2、使用DataUrl的形式存储图片（对图片byte数组进行base64编码）
+        String encode = "data:image/png;base64," + Base64.encode(file.getBytes());
+        //3、更新用户头像地址
+        user.setStaffPhoto(encode);
+        userDao.save(user);
+        //4、返回
+        return encode;
+    }*/
+
+    /**
+     * 七牛云 形式实现 图片上传
+     * @param id   用户id
+     * @param file 用户上传的头像文件
+     * @return     请求地址
+     */
+    public String uploadImage(String id, MultipartFile file) throws IOException {
+        //1、根据id查询用户
+        User user = userDao.findById(id).get();
+        //2、将图片上传到七牛云存储，获取请求路径
+        String imgUrl = new QiniuUploadUtil().upload(user.getId(), file.getBytes());
+        //3、更新用户头像地址
+        user.setStaffPhoto(imgUrl);
+        userDao.save(user);
+        //4、返回
+        return imgUrl;
+    }
+
 }

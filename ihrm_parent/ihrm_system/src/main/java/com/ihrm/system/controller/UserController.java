@@ -305,6 +305,19 @@ public class UserController extends BaseController {
         return new Result(ResultCode.SUCCESS);
     }
 
+    /**
+     * 图片上传
+     * @param id
+     * @param file
+     * @return
+     */
+    @RequestMapping("/user/upload/{id}")
+    public Result uploadImage(@PathVariable String id,@RequestParam(name = "file") MultipartFile file) throws IOException {
+        //获取图片的访问地址（dataUrl | http地址）
+        String imgUrl = userService.uploadImage(id,file);
+        return new Result(ResultCode.SUCCESS,imgUrl);
+    }
+
     public static Object getCellValue(Cell cell) {
         //1.获取到单元格的属性类型
         CellType cellType = cell.getCellType();
